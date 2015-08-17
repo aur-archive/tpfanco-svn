@@ -1,0 +1,142 @@
+diff -rupN tpfanco-read-only/tpfand/debian/tpfand.init tpfanco-read-only-aw/tpfand/debian/tpfand.init
+--- tpfanco-read-only/tpfand/debian/tpfand.init	2014-08-07 07:30:01.000000000 +0200
++++ tpfanco-read-only-aw/tpfand/debian/tpfand.init	2014-08-07 15:21:00.645897677 +0200
+@@ -12,13 +12,13 @@
+ #		     		 notebook. It can be configured by running tpfan-admin.
+ ### END INIT INFO
+ 
+-test -f /usr/sbin/tpfand || exit 0
++test -f /usr/bin/tpfand || exit 0
+ 
+ . /lib/lsb/init-functions
+ 
+ case "$1" in
+ start)	log_daemon_msg "Starting ThinkPad fan control daemon" "tpfand"
+-        start-stop-daemon --start --quiet --pidfile /var/run/tpfand.pid --name tpfand --startas /usr/sbin/tpfand -- $LSBNAMES --quiet
++        start-stop-daemon --start --quiet --pidfile /var/run/tpfand.pid --name tpfand --startas /usr/bin/tpfand -- $LSBNAMES --quiet
+         log_end_msg $?
+ 	;;
+ stop)	log_daemon_msg "Stopping ThinkPad fan control daemon" "tpfand"
+@@ -29,7 +29,7 @@ stop)	log_daemon_msg "Stopping ThinkPad
+ restart) log_daemon_msg "Restarting ThinkPad fan control daemon" "tpfand" 
+         start-stop-daemon --stop --retry 5 --quiet --pidfile /var/run/tpfand.pid
+ 		rm -f /var/run/tpfand.pid 
+-        start-stop-daemon --start --quiet --pidfile /var/run/tpfand.pid --name tpfand --startas /usr/sbin/tpfand -- $LSBNAMES
++        start-stop-daemon --start --quiet --pidfile /var/run/tpfand.pid --name tpfand --startas /usr/bin/tpfand -- $LSBNAMES
+         log_end_msg $?
+         ;;
+ force-reload)
+diff -rupN tpfanco-read-only/tpfand/etc/init.d/tpfand tpfanco-read-only-aw/tpfand/etc/init.d/tpfand
+--- tpfanco-read-only/tpfand/etc/init.d/tpfand	2014-08-07 07:30:01.000000000 +0200
++++ tpfanco-read-only-aw/tpfand/etc/init.d/tpfand	2014-08-07 15:21:20.129125460 +0200
+@@ -12,13 +12,13 @@
+ #		     		 notebook. It can be configured by running tpfan-admin.
+ ### END INIT INFO
+ 
+-test -f /usr/sbin/tpfand || exit 0
++test -f /usr/bin/tpfand || exit 0
+ 
+ . /lib/lsb/init-functions
+ 
+ case "$1" in
+ start)	log_daemon_msg "Starting ThinkPad fan control daemon" "tpfand"
+-        start-stop-daemon --start --quiet --pidfile /var/run/tpfand.pid --name tpfand --startas /usr/sbin/tpfand -- $LSBNAMES --quiet
++        start-stop-daemon --start --quiet --pidfile /var/run/tpfand.pid --name tpfand --startas /usr/bin/tpfand -- $LSBNAMES --quiet
+         log_end_msg $?
+ 	;;
+ stop)	log_daemon_msg "Stopping ThinkPad fan control daemon" "tpfand"
+@@ -29,7 +29,7 @@ stop)	log_daemon_msg "Stopping ThinkPad
+ restart) log_daemon_msg "Restarting ThinkPad fan control daemon" "tpfand" 
+         start-stop-daemon --stop --retry 5 --quiet --pidfile /var/run/tpfand.pid
+ 		rm -f /var/run/tpfand.pid 
+-        start-stop-daemon --start --quiet --pidfile /var/run/tpfand.pid --name tpfand --startas /usr/sbin/tpfand -- $LSBNAMES
++        start-stop-daemon --start --quiet --pidfile /var/run/tpfand.pid --name tpfand --startas /usr/bin/tpfand -- $LSBNAMES
+         log_end_msg $?
+         ;;
+ force-reload)
+diff -rupN tpfanco-read-only/tpfand/etc/systemd/system/tpfand.service tpfanco-read-only-aw/tpfand/etc/systemd/system/tpfand.service
+--- tpfanco-read-only/tpfand/etc/systemd/system/tpfand.service	2014-08-07 07:30:01.000000000 +0200
++++ tpfanco-read-only-aw/tpfand/etc/systemd/system/tpfand.service	2014-08-07 15:21:40.892346310 +0200
+@@ -5,7 +5,7 @@ After=syslog.target
+ [Service]
+ Type=dbus
+ BusName=org.thinkpad.fancontrol.tpfand
+-ExecStart=/usr/sbin/tpfand
++ExecStart=/usr/bin/tpfand
+ PIDFile=/var/run/tpfand.pid
+ Restart=always
+ 
+diff -rupN tpfanco-read-only/tpfand/Makefile tpfanco-read-only-aw/tpfand/Makefile
+--- tpfanco-read-only/tpfand/Makefile	2014-08-07 07:30:01.000000000 +0200
++++ tpfanco-read-only-aw/tpfand/Makefile	2014-08-07 15:20:49.719290205 +0200
+@@ -45,8 +45,8 @@ standard:
+ #	install -d $(DESTDIR)/usr/share/polkit-1
+ #	install -d $(DESTDIR)/usr/share/polkit-1/actions
+ #	install -m 644 share/polkit-1/actions/org.tpfanco.settings.policy $(DESTDIR)/usr/share/polkit-1/actions/org.tpfanco.settings.policy
+-	install -d $(DESTDIR)/usr/sbin
+-	install -m 755 src/tpfand.py $(DESTDIR)/usr/sbin/tpfand
++	install -d $(DESTDIR)/usr/bin
++	install -m 755 src/tpfand.py $(DESTDIR)/usr/bin/tpfand
+ 	install -d $(DESTDIR)/etc/modprobe.d
+ 	install -m 644 etc/modprobe.d/tpfand.conf $(DESTDIR)/etc/modprobe.d/
+ 
+@@ -58,7 +58,7 @@ uninstall:
+ 	rm -rf $(DESTDIR)/usr/share/pyshared/tpfand
+ 	rm -rf $(DESTDIR)/usr/lib/python2.7/site-packages/tpfand
+ 	rm -rf $(DESTDIR)/usr/share/tpfand/
+-	rm -f $(DESTDIR)/usr/sbin/tpfand
++	rm -f $(DESTDIR)/usr/bin/tpfand
+ 	rm -f $(DESTDIR)/etc/init.d/tpfand
+ 	rm -f $(DESTDIR)/etc/systemd/system/tpfand.service
+ 	rm -f $(DESTDIR)/usr/lib/systemd/system-sleep/tpfand-notify.sh
+diff -rupN tpfanco-read-only/tpfand/.pc/debian-changes-0.95-ubuntu2/etc/init.d/tpfand tpfanco-read-only-aw/tpfand/.pc/debian-changes-0.95-ubuntu2/etc/init.d/tpfand
+--- tpfanco-read-only/tpfand/.pc/debian-changes-0.95-ubuntu2/etc/init.d/tpfand	2014-08-07 07:30:01.000000000 +0200
++++ tpfanco-read-only-aw/tpfand/.pc/debian-changes-0.95-ubuntu2/etc/init.d/tpfand	2014-08-07 15:21:52.322284388 +0200
+@@ -12,13 +12,13 @@
+ #		     		 notebook. It can be configured by running tpfan-admin.
+ ### END INIT INFO
+ 
+-test -f /usr/sbin/tpfand || exit 0
++test -f /usr/bin/tpfand || exit 0
+ 
+ . /lib/lsb/init-functions
+ 
+ case "$1" in
+ start)	log_daemon_msg "Starting ThinkPad fan control daemon" "tpfand"
+-        start-stop-daemon --start --quiet --pidfile /var/run/tpfand.pid --name tpfand --startas /usr/sbin/tpfand -- $LSBNAMES --quiet
++        start-stop-daemon --start --quiet --pidfile /var/run/tpfand.pid --name tpfand --startas /usr/bin/tpfand -- $LSBNAMES --quiet
+         log_end_msg $?
+ 	;;
+ stop)	log_daemon_msg "Stopping ThinkPad fan control daemon" "tpfand"
+@@ -29,7 +29,7 @@ stop)	log_daemon_msg "Stopping ThinkPad
+ restart) log_daemon_msg "Restarting ThinkPad fan control daemon" "tpfand" 
+         start-stop-daemon --stop --retry 5 --quiet --pidfile /var/run/tpfand.pid
+ 		rm -f /var/run/tpfand.pid 
+-        start-stop-daemon --start --quiet --pidfile /var/run/tpfand.pid --name tpfand --startas /usr/sbin/tpfand -- $LSBNAMES
++        start-stop-daemon --start --quiet --pidfile /var/run/tpfand.pid --name tpfand --startas /usr/bin/tpfand -- $LSBNAMES
+         log_end_msg $?
+         ;;
+ *)	log_action_msg "Usage: /etc/init.d/tpfand {start|stop|restart}"
+diff -rupN tpfanco-read-only/tpfand/.pc/debian-changes-0.95-ubuntu2/Makefile tpfanco-read-only-aw/tpfand/.pc/debian-changes-0.95-ubuntu2/Makefile
+--- tpfanco-read-only/tpfand/.pc/debian-changes-0.95-ubuntu2/Makefile	2014-08-07 07:30:01.000000000 +0200
++++ tpfanco-read-only-aw/tpfand/.pc/debian-changes-0.95-ubuntu2/Makefile	2014-08-07 15:21:30.485736020 +0200
+@@ -21,8 +21,8 @@ install: all
+ 	install -m 644 share/models/generic $(DESTDIR)/usr/share/tpfand/models
+ 	install -d $(DESTDIR)/etc/dbus-1/system.d/
+ 	install -m 644 etc/dbus-1/system.d/tpfand.conf $(DESTDIR)/etc/dbus-1/system.d/tpfand.conf
+-	install -d $(DESTDIR)/usr/sbin
+-	install -m 755 wrappers/tpfand $(DESTDIR)/usr/sbin/
++	install -d $(DESTDIR)/usr/bin
++	install -m 755 wrappers/tpfand $(DESTDIR)/usr/bin/
+ 	install -d $(DESTDIR)/etc/init.d
+ 	install -m 755 etc/init.d/* $(DESTDIR)/etc/init.d/
+ 	install -d $(DESTDIR)/etc/acpi/suspend.d
+@@ -38,7 +38,7 @@ install: all
+ uninstall:
+ 	rm -rf $(DESTDIR)/usr/lib/python2.5/site-packages/tpfand
+ 	rm -rf $(DESTDIR)/usr/share/tpfand/
+-	rm -f $(DESTDIR)/usr/sbin/tpfand
++	rm -f $(DESTDIR)/usr/bin/tpfand
+ 	rm -f $(DESTDIR)/etc/init.d/tpfand
+ 	rm -f $(DESTDIR)/etc/dbus-1/system.d/tpfand.conf
+ 	rm -f $(DESTDIR)/etc/acpi/suspend.d/09-tpfand-stop.sh
